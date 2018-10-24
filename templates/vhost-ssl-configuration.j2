@@ -1,0 +1,38 @@
+<VirtualHost *:443>
+    DocumentRoot {{ apache_vhost_web_root }}
+    ServerName {{ apache_vhost_host }}
+    {% for alias in apache_vhost_server_aliases %}
+    ServerAlias {{ alias }}
+    {% endfor %}
+
+    SSLEngine on
+    SSLCertificateFile      {{ apache_vhost_ssl_crt_path }}
+    SSLCertificateKeyFile   {{ apache_vhost_ssl_key_path }}
+    {% if apache_vhost_ssl_crt_chain_path != "" %}
+    SSLCertificateChainFile {{ apache_vhost_ssl_crt_chain_path }}
+    {% endif %}
+
+    <Directory {{ apache_vhost_web_root }}>
+        AllowOverride All
+        Order allow,deny
+        Allow from All
+    </Directory>
+
+    {% for env_var in apache_vhost_env_vars %}
+    SetEnv {{ env_var.name }} {{ env_var.value }}
+    {% endfor %}
+
+    {% if apache_vhost_basic_auth_users|length > 0 %}
+    <LocationMatch {{ apache_vhost_basic_auth_location }}>
+        Order allow,deny
+        Satisfy any
+        AuthType Basic
+        AuthName "You shall not pass!"
+        AuthUserFile /etc/apache2/.htpasswd-users
+        Require valid-user
+    </LocationMatch>
+    {% endif %}
+
+    ErrorLog  /var/log/apache2/{{ apache_vhost_host }}-error_log
+    CustomLog /var/log/apache2/{{ apache_vhost_host }}-access_log combined
+</VirtualHost>

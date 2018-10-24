@@ -1,0 +1,41 @@
+---
+- name: Create .htpasswd-users
+  template:
+    dest: /etc/apache2/.htpasswd-users
+    src: htpasswd-users.j2
+    owner: "{{ apache_vhost_apache_user }}"
+    group: "{{ apache_vhost_apache_group }}"
+  when: apache_vhost_basic_auth_users is defined and apache_vhost_basic_auth_users > 0
+
+- name: Create apache2 configuration
+  template:
+    src: vhost-configuration.j2
+    dest: /etc/apache2/sites-available/{{ apache_vhost_host }}.conf
+  notify: reload apache
+
+- name: Create apache2 ssl configuration
+  template:
+    src: vhost-ssl-configuration.j2
+    dest: /etc/apache2/sites-available/{{ apache_vhost_host }}.ssl.conf
+  notify: reload apache
+  when: apache_vhost_ssl_crt_path != "" and apache_vhost_ssl_key_path != ""
+
+- name: Check if project is enabled
+  stat: path=/etc/apache2/sites-enabled/{{ apache_vhost_host }}.conf
+  register: vhost
+
+- name: Check if ssl project is enabled
+  stat: path=/etc/apache2/sites-enabled/{{ apache_vhost_host }}.conf
+  register: vhost_ssl
+  when: apache_vhost_ssl_crt_path != "" and apache_vhost_ssl_key_path != ""
+
+- name: Enable apache2 vhost
+  shell: a2ensite {{ apache_vhost_host }}.conf
+  when: vhost.stat.exists == false
+  notify: reload apache
+
+- name: Enable apache2 vhosts ssl
+  shell: a2ensite {{ apache_vhost_host }}.ssl.conf
+  when: vhost_ssl.stat.exists == false # TODO: this condition is skipped
+  notify: reload apache
+  when: apache_vhost_ssl_crt_path != "" and apache_vhost_ssl_key_path != ""
