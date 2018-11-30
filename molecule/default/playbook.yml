@@ -6,5 +6,4 @@
     apache_vhost_host: "site.example.com"
     apache_vhost_web_root: "/var/www/"
   roles:
-    - role: iroquoisorg.apache
     - role: ansible-role-apache
