@@ -30,11 +30,11 @@
   when: apache_vhost_ssl_crt_path != "" and apache_vhost_ssl_key_path != ""
 
 - name: Enable apache2 vhost
-  shell: a2ensite {{ apache_vhost_host }}.conf
+  command: a2ensite {{ apache_vhost_host }}.conf
   when: vhost.stat.exists == false
   notify: reload apache
 
 - name: Enable apache2 vhosts ssl
-  shell: a2ensite {{ apache_vhost_host }}.ssl.conf
+  command: a2ensite {{ apache_vhost_host }}.ssl.conf
   notify: reload apache
-  when: not vhost_ssl.stat.exists and apache_vhost_ssl_crt_path != "" and apache_vhost_ssl_key_path != ""
+  when: apache_vhost_ssl_crt_path != "" and apache_vhost_ssl_key_path != "" and not vhost_ssl.stat.exists
