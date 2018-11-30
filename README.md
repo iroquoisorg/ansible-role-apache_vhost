@@ -30,3 +30,7 @@ apache_vhost_apache_group: "{{ apache_group | default(\"www-data\") }}"
 apache_vhost_server_aliases: []
 
 ```
+
+# Development
+
+Please check [development guide](DEVELOPMENT.md) for details about developing and testing this role.

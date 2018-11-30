@@ -36,6 +36,5 @@
 
 - name: Enable apache2 vhosts ssl
   shell: a2ensite {{ apache_vhost_host }}.ssl.conf
-  when: vhost_ssl.stat.exists == false # TODO: this condition is skipped
   notify: reload apache
-  when: apache_vhost_ssl_crt_path != "" and apache_vhost_ssl_key_path != ""
+  when: not vhost_ssl.stat.exists and apache_vhost_ssl_crt_path != "" and apache_vhost_ssl_key_path != ""
