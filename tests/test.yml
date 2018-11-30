@@ -1,9 +1,0 @@
----
-- hosts: localhost
-  remote_user: root
-  vars:
-    apache_vhost_host: "site.example.com"
-    apache_vhost_web_root: "/var/www/"
-  roles:
-    - iroquoisorg.apache
-    - ansible-role-apache_vhost
